@@ -43,6 +43,9 @@ def run(run_id:str):
 def review(run_id:str,payload:dict=Body(...)):
     revision=payload.get('revision')
     if not isinstance(revision,int) or revision<1: raise BusinessError('BAD_REVISION','版本号须为正整数')
+    run=store.get(DB_PATH,run_id)
+    if run['archive']['status']!='可归档':
+        raise BusinessError('ARCHIVE_BLOCKED','存在版本断点或账目不平，归档未通过，旧版与已付款记录保留',409)
     return store.review(DB_PATH,run_id,revision)
 @app.get('/api/export/{run_id}')
 def export(run_id:str):

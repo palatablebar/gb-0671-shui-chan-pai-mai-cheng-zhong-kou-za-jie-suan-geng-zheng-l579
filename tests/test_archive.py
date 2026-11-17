@@ -17,3 +17,10 @@ def test_bundle_evidence_real(sample):
     z=zipfile.ZipFile(io.BytesIO(serialize(sample)));data=json.loads(z.read('evidence.json'));assert len(data['quarantine'])==8
 def test_bundle_manifest_real(sample):
     z=zipfile.ZipFile(io.BytesIO(serialize(sample)));assert json.loads(z.read('manifest.json'))['run_id']==sample['manifest']['run_id']
+
+def test_archive_unique_current_required(sample):
+    s=deepcopy(sample);s['final'].append(dict(s['final'][0]))
+    d=archive_decision(s);assert d['status']=='待处理';assert d['unique_current'] is False
+
+def test_archive_decision_exposes_blocked(sample):
+    assert sample['archive']['blocked']==0 and sample['archive']['unique_current'] is True

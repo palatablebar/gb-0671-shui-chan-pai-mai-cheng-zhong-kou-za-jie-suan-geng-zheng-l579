@@ -11,7 +11,12 @@ def normalize(row):
     paid=number(row['paid']);version=number(row['version'])
     if weight<0 or price<0 or paid<0 or not 0<=rate<1 or version<1 or version%1:
         raise BusinessError('INVALID_RANGE','重量、单价、扣杂率或版本越界')
-    out.update(weight_kg=str(weight),price=str(price),rate=str(rate),paid=str(paid),version=int(version))
+    replaces=row['replaces'].strip()
+    if replaces:
+        base=number(replaces)
+        if base<1 or base%1: raise BusinessError('INVALID_RANGE','替代版本越界')
+        replaces=str(int(base))
+    out.update(weight_kg=str(weight),price=str(price),rate=str(rate),paid=str(paid),version=int(version),replaces=replaces)
     if not row['ticket'].strip() or not row['fish'].strip(): raise BusinessError('UNKNOWN_REFERENCE','票号或品类缺失')
     return out
 
